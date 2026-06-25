@@ -7,3 +7,5 @@ CREATE TABLE IF NOT EXISTS todos (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_todos_completed ON todos(completed);
