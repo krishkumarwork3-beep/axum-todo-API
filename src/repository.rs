@@ -44,3 +44,32 @@ impl TodoRepository for PostgresTodoRepository {
 
         Ok(todo)
     }
+    async fn list(&self, completed: Option<bool>) -> Result<Vec<TodoResponse>, AppError> {
+        let todos = if let Some(completed) = completed {
+            sqlx::query_as!(
+                TodoResponse,
+                r#"
+                SELECT id, title, description, completed as "completed!", created_at as "created_at!", updated_at as "updated_at!"
+                FROM todos
+                WHERE completed = $1
+                ORDER BY created_at DESC
+                "#,
+                completed
+            )
+            .fetch_all(&self.pool)
+            .await?
+        } else {
+            sqlx::query_as!(
+                TodoResponse,
+                r#"
+                SELECT id, title, description, completed as "completed!", created_at as "created_at!", updated_at as "updated_at!"
+                FROM todos
+                ORDER BY created_at DESC
+                "#
+            )
+            .fetch_all(&self.pool)
+            .await?
+        };
+
+        Ok(todos)
+    }
