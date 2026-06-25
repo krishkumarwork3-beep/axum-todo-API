@@ -10,3 +10,11 @@ pub async fn create_pool(database_url: &str) -> Result<DbPool, SqlxError> {
         .connect(database_url)
         .await
 }
+
+/// Initializes the database (runs migrations if needed)
+/// Note: In production, use sqlx-cli for migrations
+pub async fn init_db(_pool: &DbPool) -> Result<(), SqlxError> {
+    // Migrations should be run via sqlx-cli:
+    // sqlx migrate run
+    Ok(())
+}
