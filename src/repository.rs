@@ -14,3 +14,14 @@ pub trait TodoRepository: Send +Sync {
     async fn delete(&self, id: Uuid) -> Result<(), AppError>;
     async fn mark_completed(&self, id: Uuid) -> Result<TodoResponse, AppError>;
 }
+
+/// PostgreSQL implementation of TodoRepository
+pub struct PostgresTodoRepository {
+    pool: DbPool,
+}
+
+impl PostgresTodoRepository {
+    pub fn new(pool: DbPool) -> Self {
+        Self { pool }
+    }
+}
