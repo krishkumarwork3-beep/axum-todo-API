@@ -25,3 +25,22 @@ impl PostgresTodoRepository {
         Self { pool }
     }
 }
+
+#[async_trait]
+impl TodoRepository for PostgresTodoRepository {
+    async fn create(&self, payload: CreateTodo) -> Result<TodoResponse, AppError> {
+        let todo = sqlx::query_as!(
+            TodoResponse,
+            r#"
+            INSERT INTO todos (title, description)
+            VALUES ($1, $2)
+            RETURNING id, title, description, completed as "completed!", created_at as "created_at!", updated_at as "updated_at!"
+            "#,
+            payload.title,
+            payload.description
+        )
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(todo)
+    }
