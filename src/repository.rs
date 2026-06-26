@@ -212,3 +212,22 @@ impl TodoRepository for PostgresTodoRepository {
 
         Ok(())
     }
+
+    async fn mark_completed(&self, id: Uuid) -> Result<TodoResponse, AppError> {
+        let todo = sqlx::query_as!(
+            TodoResponse,
+            r#"
+            UPDATE todos
+            SET completed = true, updated_at = NOW()
+            WHERE id = $1
+            RETURNING id, title, description, completed as "completed!", created_at as "created_at!", updated_at as "updated_at!"
+            "#,
+            id
+        )
+        .fetch_optional(&self.pool)
+        .await?
+        .ok_or_else(|| AppError::NotFound(format!("Todo with id {} not found", id)))?;
+
+        Ok(todo)
+    }
+}
