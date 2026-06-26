@@ -200,3 +200,15 @@ impl TodoRepository for PostgresTodoRepository {
 
         Ok(todo)
     }
+
+    async fn delete(&self, id: Uuid) -> Result<(), AppError> {
+        let result = sqlx::query!(r#"DELETE FROM todos WHERE id = $1"#, id)
+            .execute(&self.pool)
+            .await?;
+
+        if result.rows_affected() == 0 {
+            return Err(AppError::NotFound(format!("Todo with id {} not found", id)));
+        }
+
+        Ok(())
+    }
