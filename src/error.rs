@@ -44,3 +44,9 @@ pub enum ErrorMessage {
     TokenNotProvided,
     UserNotAuthenticated,
 }
+
+impl ToString for ErrorMessage {
+    fn to_string(&self) -> String {
+        self.to_str().to_owned()
+    }
+}
