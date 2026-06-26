@@ -50,3 +50,16 @@ impl ToString for ErrorMessage {
         self.to_str().to_owned()
     }
 }
+
+impl ErrorMessage {
+    fn to_str(&self) -> String {
+        match self {
+            ErrorMessage::ServerError => "Server Error. Please try again later".to_string(),
+            ErrorMessage::BadRequest => "Bad request".to_string(),
+            ErrorMessage::Unauthorized => "Unauthorized".to_string(),
+            ErrorMessage::PermissionDenied => {
+                "You are not allowed to perform this action".to_string()
+            }
+            ErrorMessage::TodoNotFound => "Todo not found".to_string(),
+            ErrorMessage::TodoValidationError => "Validation error".to_string(),
+            ErrorMessage::TodoAlreadyCompleted => "Todo is already completed".to_string(),
