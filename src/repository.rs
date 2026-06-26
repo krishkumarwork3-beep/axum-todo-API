@@ -127,3 +127,76 @@ impl TodoRepository for PostgresTodoRepository {
             " WHERE id = ${} RETURNING id, title, description, completed, created_at, updated_at",
             param_count
         ));
+
+        let todo = match (title_param, description_param, completed_param) {
+            (Some(title), Some(description), Some(completed)) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(title)
+                    .bind(description)
+                    .bind(completed)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (Some(title), Some(description), None) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(title)
+                    .bind(description)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (Some(title), None, Some(completed)) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(title)
+                    .bind(completed)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (Some(title), None, None) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(title)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (None, Some(description), Some(completed)) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(description)
+                    .bind(completed)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (None, Some(description), None) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(description)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (None, None, Some(completed)) => {
+                sqlx::query_as::<_, TodoResponse>(&query_str)
+                    .bind(completed)
+                    .bind(id)
+                    .fetch_one(&self.pool)
+                    .await?
+            }
+            (None, None, None) => {
+                sqlx::query_as!(
+                    TodoResponse,
+                    r#"
+                    SELECT id, title, description, completed as "completed!", created_at as "created_at!", updated_at as "updated_at!"
+                    FROM todos
+                    WHERE id = $1
+                    "#,
+                    id
+                )
+                .fetch_one(&self.pool)
+                .await?
+            }
+        };
+
+        Ok(todo)
+    }
