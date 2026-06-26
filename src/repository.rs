@@ -90,3 +90,40 @@ impl TodoRepository for PostgresTodoRepository {
 
         Ok(todo)
     }
+
+    async fn update(&self, id: Uuid, payload: UpdateTodo) -> Result<TodoResponse, AppError> {
+        // Check if todo exists first
+        let _existing = sqlx::query!(r#"SELECT id FROM todos WHERE id = $1"#, id)
+            .fetch_optional(&self.pool)
+            .await?
+            .ok_or_else(|| AppError::NotFound(format!("Todo with id {} not found", id)))?;
+
+        // Build update query dynamically based on provided fields
+        let mut query_str = "UPDATE todos SET updated_at = NOW()".to_string();
+        let mut param_count = 1;
+        let mut title_param: Option<String> = None;
+        let mut description_param: Option<String> = None;
+        let mut completed_param: Option<bool> = None;
+
+        if payload.title.is_some() {
+            query_str.push_str(&format!(", title = ${}", param_count));
+            param_count += 1;
+            title_param = payload.title;
+        }
+
+        if payload.description.is_some() {
+            query_str.push_str(&format!(", description = ${}", param_count));
+            param_count += 1;
+            description_param = payload.description;
+        }
+
+        if payload.completed.is_some() {
+            query_str.push_str(&format!(", completed = ${}", param_count));
+            param_count += 1;
+            completed_param = payload.completed;
+        }
+
+        query_str.push_str(&format!(
+            " WHERE id = ${} RETURNING id, title, description, completed, created_at, updated_at",
+            param_count
+        ));
