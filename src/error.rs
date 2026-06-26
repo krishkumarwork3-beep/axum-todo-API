@@ -18,3 +18,29 @@ impl fmt::Display for ErrorResponse {
         write!(f, "{}", serde_json::to_string(&self).unwrap())
     }
 }
+
+#[derive(Debug, PartialEq)]
+pub enum ErrorMessage {
+    // Generic errors
+    ServerError,
+    BadRequest,
+    Unauthorized,
+    PermissionDenied,
+
+    // Todo specific errors
+    TodoNotFound,
+    TodoValidationError,
+    TodoAlreadyCompleted,
+
+    // Auth related (keep for future use)
+    EmptyPassword,
+    ExceededMaxPasswordLength(usize),
+    InvalidHashFormat,
+    HashingError,
+    InvalidToken,
+    WrongCredentials,
+    EmailExist,
+    UserNoLongerExist,
+    TokenNotProvided,
+    UserNotAuthenticated,
+}
