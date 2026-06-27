@@ -113,3 +113,9 @@ impl From<SqlxError> for AppError {
         AppError::DatabaseError(error)
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct HttpError {
+    pub message: String,
+    pub status: StatusCode,
+}
