@@ -16,3 +16,21 @@ use uuid::Uuid;
 pub struct TodoFilter {
     completed: Option<bool>,
 }
+
+/// Create a new todo
+pub async fn create_todo(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Json(payload): Json<CreateTodo>,
+) -> Result<impl IntoResponse, AppError> {
+    let todo = repo.create(payload).await?;
+    Ok((StatusCode::CREATED, Json(todo)))
+}
+
+/// List all todos with optional filtering
+pub async fn list_todos(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Query(filter): Query<TodoFilter>,
+) -> Result<Json<Vec<TodoResponse>>, AppError> {
+    let todos = repo.list(filter.completed).await?;
+    Ok(Json(todos))
+}
