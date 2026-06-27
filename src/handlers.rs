@@ -34,3 +34,22 @@ pub async fn list_todos(
     let todos = repo.list(filter.completed).await?;
     Ok(Json(todos))
 }
+
+/// Get a specific todo by ID
+pub async fn get_todo(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<TodoResponse>, AppError> {
+    let todo = repo.get(id).await?;
+    Ok(Json(todo))
+}
+
+/// Update a todo (partial update)
+pub async fn update_todo(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Path(id): Path<Uuid>,
+    Json(payload): Json<UpdateTodo>,
+) -> Result<Json<TodoResponse>, AppError> {
+    let todo = repo.update(id, payload).await?;
+    Ok(Json(todo))
+}
