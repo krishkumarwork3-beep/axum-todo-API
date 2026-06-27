@@ -62,3 +62,12 @@ pub async fn delete_todo(
     repo.delete(id).await?;
     Ok(StatusCode::NO_CONTENT)
 }
+
+/// Mark a todo as completed
+pub async fn mark_completed(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<TodoResponse>, AppError> {
+    let todo = repo.mark_completed(id).await?;
+    Ok(Json(todo))
+}
