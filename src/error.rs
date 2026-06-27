@@ -107,3 +107,9 @@ impl fmt::Display for AppError {
 }
 
 impl std::error::Error for AppError {}
+
+impl From<SqlxError> for AppError {
+    fn from(error: SqlxError) -> Self {
+        AppError::DatabaseError(error)
+    }
+}
