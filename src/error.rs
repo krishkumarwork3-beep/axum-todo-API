@@ -119,3 +119,11 @@ pub struct HttpError {
     pub message: String,
     pub status: StatusCode,
 }
+
+impl HttpError {
+    pub fn new(message: impl Into<String>, status: StatusCode) -> Self {
+        HttpError {
+            message: message.into(),
+            status,
+        }
+    }
