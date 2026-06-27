@@ -1,3 +1,4 @@
+#![allow(unused)]
 mod db;
 mod error;
 mod handlers;
