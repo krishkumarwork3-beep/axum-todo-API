@@ -53,3 +53,12 @@ pub async fn update_todo(
     let todo = repo.update(id, payload).await?;
     Ok(Json(todo))
 }
+
+/// Delete a todo
+pub async fn delete_todo(
+    State(repo): State<Arc<dyn TodoRepository>>,
+    Path(id): Path<Uuid>,
+) -> Result<StatusCode, AppError> {
+    repo.delete(id).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
