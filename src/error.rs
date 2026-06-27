@@ -84,3 +84,12 @@ impl ErrorMessage {
         }
     }
 }
+
+#[derive(Debug)]
+pub enum AppError {
+    NotFound(String),
+    BadRequest(String),
+    Unauthorized(String),
+    DatabaseError(SqlxError),
+    Internal(String),
+}
