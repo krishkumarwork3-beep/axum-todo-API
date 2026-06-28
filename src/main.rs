@@ -53,3 +53,11 @@ async fn main() {
         .route("/todos/{id}", patch(handlers::update_todo))
         .route("/todos/{id}", delete(handlers::delete_todo))
         .route("/todos/{id}/complete", patch(handlers::mark_completed))
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any),
+        )
+        .layer(TraceLayer::new_for_http())
+        .with_state(repo);
