@@ -45,6 +45,9 @@ async fn main() {
         .expect("Failed to create database pool");
 
     tracing::info!("Connected to database");
+
+    // Create repository
+    let repo: Arc<dyn repository::TodoRepository> = Arc::new(PostgresTodoRepository::new(pool));
     // Build our application with routes
     let app = Router::new()
         .route("/todos", post(handlers::create_todo))
