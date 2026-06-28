@@ -61,3 +61,13 @@ async fn main() {
         )
         .layer(TraceLayer::new_for_http())
         .with_state(repo);
+    // Run the server
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+    tracing::info!("Server listening on {}", addr);
+
+    let listener = tokio::net::TcpListener::bind(addr)
+        .await
+        .expect("Failed to bind to address");
+
+    axum::serve(listener, app).await.expect("Server error");
+}
