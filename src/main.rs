@@ -45,3 +45,11 @@ async fn main() {
         .expect("Failed to create database pool");
 
     tracing::info!("Connected to database");
+    // Build our application with routes
+    let app = Router::new()
+        .route("/todos", post(handlers::create_todo))
+        .route("/todos", get(handlers::list_todos))
+        .route("/todos/{id}", get(handlers::get_todo))
+        .route("/todos/{id}", patch(handlers::update_todo))
+        .route("/todos/{id}", delete(handlers::delete_todo))
+        .route("/todos/{id}/complete", patch(handlers::mark_completed))
