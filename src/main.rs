@@ -18,6 +18,30 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-fn main() {
-    println!("Hello, world!");
-}
+#[tokio::main]
+async fn main() {
+    // Load environment variables from .env file
+    dotenv().ok();
+
+    // Initialize tracing
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "axum_todo=debug,tower_http=debug,axum=trace".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    // Get environment variables
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let port: u16 = std::env::var("PORT")
+        .unwrap_or_else(|_| "3000".to_string())
+        .parse()
+        .expect("PORT must be a valid u16");
+
+    // Create database connection pool
+    let pool = create_pool(&database_url)
+        .await
+        .expect("Failed to create database pool");
+
+    tracing::info!("Connected to database");
