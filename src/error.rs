@@ -203,3 +203,11 @@ impl From<AppError> for HttpError {
         }
     }
 }
+
+// Implement IntoResponse for AppError so it can be used directly in handlers
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let http_error: HttpError = self.into();
+        http_error.into_response()
+    }
+}
