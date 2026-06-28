@@ -190,3 +190,16 @@ impl IntoResponse for HttpError {
         self.into_http_response()
     }
 }
+
+// Convert AppError to HttpError for IntoResponse
+impl From<AppError> for HttpError {
+    fn from(err: AppError) -> Self {
+        match err {
+            AppError::NotFound(msg) => HttpError::not_found(msg),
+            AppError::BadRequest(msg) => HttpError::bad_request(msg),
+            AppError::Unauthorized(msg) => HttpError::unauthorized(msg),
+            AppError::DatabaseError(e) => HttpError::server_error(e.to_string()),
+            AppError::Internal(msg) => HttpError::server_error(msg),
+        }
+    }
+}
